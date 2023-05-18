@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <Windows.h>
 
-int main(void) { // creating a process that start notepad
+int main(void) { // creating a process that start mspaint
 
     // BOOL CreateProcessW(
     //     [in, optional]      LPCWSTR               lpApplicationName,
@@ -20,7 +20,7 @@ int main(void) { // creating a process that start notepad
     PROCESS_INFORMATION pi = { 0 };
 
     if (!CreateProcessW(
-        L"C:\\Windows\\System32\\notepad.exe",
+        L"C:\\Windows\\System32\\mspaint.exe",
         NULL,
         NULL,
         NULL,

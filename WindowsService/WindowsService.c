@@ -1,7 +1,10 @@
-#include <windows.h>
+#include <Windows.h>
+#include <lmcons.h>
 #include <stdio.h>
+#include <time.h>
 
 SERVICE_STATUS_HANDLE g_StatusHandle;
+int fileCounter = 1;
 
 void WINAPI ServiceMain(DWORD argc, LPTSTR *argv);
 void WINAPI ServiceCtrlHandler(DWORD ctrlCode);
@@ -19,7 +22,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void WINAPI ServiceMain(DWORD argc, LPTSTR *argv) {
+void WINAPI ServiceMain(DWORD argc, LPTSTR* argv) {
     g_StatusHandle = RegisterServiceCtrlHandler(TEXT("MyService"), ServiceCtrlHandler);
     if (!g_StatusHandle) {
         return;
@@ -28,12 +31,36 @@ void WINAPI ServiceMain(DWORD argc, LPTSTR *argv) {
     ReportStatus(SERVICE_RUNNING, NO_ERROR, 0);
 
     while (1) {
-        FILE *fp = fopen("C:\\Users\\robin\\OneDrive\\Documents\\code\\windows-api\\WindowsServiceStatus.txt", "w");
+        // Get the current time
+        time_t now = time(NULL);
+        struct tm* timeInfo = localtime(&now);
+        char timeBuffer[80];
+        strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", timeInfo);
+
+        // Create the status update string
+        char statusUpdate[100];
+        snprintf(statusUpdate, sizeof(statusUpdate), "(+) %s - I am watching u", timeBuffer);
+
+        // Create the file name with the incremented counter
+        char fileName[100];
+        snprintf(fileName, sizeof(fileName), "C:\\Users\\Public\\Desktop\\IAmWatchingU%d.txt", fileCounter);
+
+        // Open the file in append mode and write the status update
+        FILE* fp = fopen(fileName, "a");
         if (fp != NULL) {
-            fprintf(fp, "Service is running\n");
+            fprintf(fp, "%s\n", statusUpdate);
             fclose(fp);
         }
-        Sleep(5000);
+
+        // Increment the file counter
+        fileCounter++;
+
+        // Convert 30 minutes to milliseconds
+        int delayInMinutes = 1;
+        int delayInMilliseconds = delayInMinutes * 60 * 1000;
+
+        // Sleep for 30 minutes
+        Sleep(delayInMilliseconds);
     }
 }
 
